@@ -1,0 +1,13 @@
+import { defineConfig } from "drizzle-kit";
+import env from "./src/env";
+
+console.log(env);
+
+export default defineConfig({
+  out: "./src/db/migrations",
+  schema: "./src/db/schema.ts",
+  dialect: "sqlite",
+  dbCredentials: {
+    url: env.DATABASE_URL,
+  },
+});
