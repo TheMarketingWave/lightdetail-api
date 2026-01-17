@@ -36,6 +36,22 @@ export const updateProjectSchema = createUpdateSchema(projectsTable, {
   createdAt: true,
 });
 
+export const staffTable = sqliteTable("staff", {
+  id: integer().primaryKey({ autoIncrement: true }),
+  name: text().notNull(),
+  author: text(),
+  description: text(),
+  coverImageUrl: text(),
+  updatedAt: integer(),
+  createdAt: integer(),
+});
+
+export const selectStaffTableSchema = createSelectSchema(staffTable);
+export const addStaffTableSchema = createInsertSchema(staffTable).omit({
+  id: true,
+});
+export const updateStaffTableSchema = createUpdateSchema(staffTable);
+
 export const user = sqliteTable("user", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
@@ -71,7 +87,7 @@ export const session = sqliteTable(
       .references(() => user.id, { onDelete: "cascade" }),
     impersonatedBy: text("impersonated_by"),
   },
-  (table) => [index("session_userId_idx").on(table.userId)]
+  (table) => [index("session_userId_idx").on(table.userId)],
 );
 
 export const account = sqliteTable(
@@ -99,7 +115,7 @@ export const account = sqliteTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [index("account_userId_idx").on(table.userId)]
+  (table) => [index("account_userId_idx").on(table.userId)],
 );
 
 export const verification = sqliteTable(
@@ -114,7 +130,7 @@ export const verification = sqliteTable(
       .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => [index("verification_identifier_idx").on(table.identifier)]
+  (table) => [index("verification_identifier_idx").on(table.identifier)],
 );
 
 export const userRelations = relations(user, ({ many }) => ({

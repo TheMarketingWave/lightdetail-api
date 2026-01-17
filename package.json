@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "dev": "bun run --hot src/index.ts",
+    "build:img": "docker build -t lightdetail-api .",
     "studio:db": "bunx -b drizzle-kit studio",
     "run:container": "bunx -b drizzle-kit migrate && bun run src/index.ts"
   },

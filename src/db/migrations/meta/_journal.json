@@ -36,6 +36,13 @@
       "when": 1768387602036,
       "tag": "0004_clammy_steve_rogers",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1768674265633,
+      "tag": "0005_lonely_harpoon",
+      "breakpoints": true
     }
   ]
 }

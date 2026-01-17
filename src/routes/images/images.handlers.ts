@@ -7,12 +7,12 @@ import { basename } from "node:path";
 const LIMIT_1MB = 1 * 1024 * 1024;
 
 export const uploadImgHandler: AppRouteHandler<UploadImageRoute> = async (
-  c
+  c,
 ) => {
   const body = await c.req.parseBody();
   const file = body.file as File;
   const filename = `image_${Date.now()}.webp`;
-  const savePath = `./uploads/${filename}`;
+  const savePath = `./data/uploads/${filename}`;
 
   try {
     if (file.type === "image/webp" && file.size < LIMIT_1MB) {
@@ -24,7 +24,7 @@ export const uploadImgHandler: AppRouteHandler<UploadImageRoute> = async (
           filename,
           size: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
         },
-        OK
+        OK,
       );
     }
 
@@ -49,7 +49,7 @@ export const uploadImgHandler: AppRouteHandler<UploadImageRoute> = async (
         filename,
         size: `${(processedBuffer.byteLength / 1024 / 1024).toFixed(2)} MB`,
       },
-      OK
+      OK,
     );
   } catch (error) {
     console.error(error);
@@ -61,7 +61,7 @@ export const getImgHandler: AppRouteHandler<GetImageRoute> = async (c) => {
   const { id } = c.req.valid("param");
   const filename = basename(id);
 
-  const path = `./uploads/${filename}`;
+  const path = `./data/uploads/${filename}`;
 
   const file = Bun.file(path);
   if (!(await file.exists())) {
