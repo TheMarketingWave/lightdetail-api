@@ -1,14 +1,18 @@
 import { createRouter } from "../../lib/create-app";
 import {
   addProjectHandler,
+  deleteProjectHandler,
   getProjectByIdtHandler,
+  orderProjectListHandler,
   projectsListByTypeHandler,
   projectsListHandler,
   updateProjectHandler,
 } from "./projects.handlers";
 import {
   addProjectsRoute,
+  deleteProjectRoute,
   getProjectByIdtRoute,
+  orderProjectsListRoute,
   projectsListByTypeRoute,
   projectsListRoute,
   updateProjectRoute,
@@ -17,7 +21,10 @@ import {
 const router = createRouter()
   .openapi(projectsListRoute, projectsListHandler)
   .openapi(getProjectByIdtRoute, getProjectByIdtHandler)
-  .openapi(addProjectsRoute, addProjectHandler)
   .openapi(projectsListByTypeRoute, projectsListByTypeHandler)
-  .openapi(updateProjectRoute, updateProjectHandler);
+  .openapi(addProjectsRoute, addProjectHandler)
+  .openapi(updateProjectRoute, updateProjectHandler)
+  .openapi(deleteProjectRoute, deleteProjectHandler)
+  .openapi(orderProjectsListRoute, orderProjectListHandler);
+
 export default router;

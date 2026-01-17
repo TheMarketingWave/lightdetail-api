@@ -1,12 +1,24 @@
 import { relations } from "drizzle-orm";
 import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
-import { createInsertSchema, createSelectSchema } from "drizzle-zod";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-zod";
 import z from "zod";
 
 export const projectsTable = sqliteTable("projects", {
   id: integer().primaryKey({ autoIncrement: true }),
   title: text().notNull(),
   type: text().$type<"residential" | "commercial">().notNull(),
+  coverImageUrl: text(),
+  description: text(),
+  latestPosition: integer(),
+  tags: text("tags", { mode: "json" }).$type<string[]>().notNull().default([]),
+  imgs: text("imgs", { mode: "json" }).$type<string[]>().notNull().default([]),
+  updatedAt: integer(),
+  createdAt: integer(),
+  order: integer().default(1),
 });
 
 export const selectProjectsSchema = createSelectSchema(projectsTable);
@@ -15,6 +27,13 @@ export const addProjectSchema = createInsertSchema(projectsTable, {
   type: z.enum(["residential", "commercial"]),
 }).omit({
   id: true,
+});
+
+export const updateProjectSchema = createUpdateSchema(projectsTable, {
+  title: z.string().min(1).optional(),
+  type: z.enum(["residential", "commercial"]).optional(),
+}).omit({
+  createdAt: true,
 });
 
 export const user = sqliteTable("user", {
@@ -29,6 +48,10 @@ export const user = sqliteTable("user", {
   updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .$onUpdate(() => new Date())
     .notNull(),
+  role: text("role"),
+  banned: integer("banned", { mode: "boolean" }).default(false),
+  banReason: text("ban_reason"),
+  banExpires: integer("ban_expires", { mode: "timestamp_ms" }),
 });
 
 export const session = sqliteTable(
@@ -46,6 +69,7 @@ export const session = sqliteTable(
     userId: text("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    impersonatedBy: text("impersonated_by"),
   },
   (table) => [index("session_userId_idx").on(table.userId)]
 );

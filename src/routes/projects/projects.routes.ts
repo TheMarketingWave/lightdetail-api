@@ -5,42 +5,15 @@ import {
   UNPROCESSABLE_ENTITY,
 } from "../../middlewares/helpers/http-status-codes";
 import jsonContent from "../../middlewares/helpers/ json-content";
-import { addProjectSchema, selectProjectsSchema } from "../../db/schema";
+import {
+  addProjectSchema,
+  selectProjectsSchema,
+  updateProjectSchema,
+} from "../../db/schema";
 import jsonContentRequired from "../../middlewares/helpers/json-content-required";
 import createErrorSchema from "../../middlewares/helpers/create-error-schema";
-
-const coercedInt = z.transform((val: string, ctx) => {
-  try {
-    const parsed = Number.parseInt(String(val));
-    if (Number.isNaN(parsed)) {
-      throw new Error("not a number");
-    }
-
-    return parsed;
-  } catch (e) {
-    ctx.issues.push({
-      code: "invalid_value",
-      message: "Not a number",
-      input: val,
-      values: [Number.parseInt(String(val))],
-    });
-
-    return z.NEVER;
-  }
-});
-
-const idParamSchema = z.object({
-  id: z
-    .string()
-    .pipe(coercedInt)
-    .openapi({
-      param: {
-        name: "id",
-        in: "path",
-      },
-      example: "1",
-    }),
-});
+import { createProtectedRoute } from "../../middlewares/auth-middleware";
+import { idParamSchema } from "../../middlewares/helpers/id-parama-schema";
 
 export const projectsListRoute = createRoute({
   tags: ["projects"],
@@ -64,37 +37,19 @@ export const getProjectByIdtRoute = createRoute({
     [OK]: jsonContent(selectProjectsSchema, "Project found"),
     [UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(selectProjectsSchema),
-      "The validation error"
+      "The validation error",
     ),
     [NOT_FOUND]: jsonContent(
       z.object({
         msg: z.string(),
       }),
 
-      "Id not found"
+      "Id not found",
     ),
   },
 });
 
 export type GetProjectByIdtRoute = typeof getProjectByIdtRoute;
-
-export const addProjectsRoute = createRoute({
-  tags: ["projects"],
-  path: "/projects",
-  method: "post",
-  request: {
-    body: jsonContentRequired(addProjectSchema, "Add project"),
-  },
-  responses: {
-    [OK]: jsonContent(selectProjectsSchema, "The created project"),
-    [UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(addProjectSchema),
-      "The validation error"
-    ),
-  },
-});
-
-export type AddProjectRoute = typeof addProjectsRoute;
 
 const typeParamSchema = z.object({
   type: z.enum(["residential", "commercial"]).openapi({
@@ -108,7 +63,7 @@ const typeParamSchema = z.object({
 
 export const projectsListByTypeRoute = createRoute({
   tags: ["projects"],
-  path: "/projects/{type}",
+  path: "/projects/type/{type}",
   method: "get",
   request: {
     params: typeParamSchema,
@@ -116,39 +71,104 @@ export const projectsListByTypeRoute = createRoute({
   responses: {
     [OK]: jsonContent(
       z.array(selectProjectsSchema),
-      "List of projects byt type"
+      "List of projects byt type",
     ),
     [UNPROCESSABLE_ENTITY]: jsonContent(
       createErrorSchema(typeParamSchema),
-      "The validation error"
+      "The validation error",
     ),
   },
 });
 
 export type ProjectListByTypeRoute = typeof projectsListByTypeRoute;
 
-export const updateProjectRoute = createRoute({
+export const addProjectsRoute = createProtectedRoute({
   tags: ["projects"],
-  path: "/projects/{id}",
-  method: "patch",
+  path: "/projects/add",
+  method: "post",
   request: {
-    params: idParamSchema,
-    body: jsonContentRequired(addProjectSchema.partial(), "Update project"),
+    body: jsonContentRequired(addProjectSchema, "Add project"),
   },
   responses: {
     [OK]: jsonContent(selectProjectsSchema, "The created project"),
     [UNPROCESSABLE_ENTITY]: jsonContent(
-      createErrorSchema(idParamSchema.or(addProjectSchema.partial())),
-      "The validation error"
+      createErrorSchema(addProjectSchema),
+      "The validation error",
+    ),
+  },
+});
+
+export type AddProjectRoute = typeof addProjectsRoute;
+
+export const updateProjectRoute = createProtectedRoute({
+  tags: ["projects"],
+  path: "/projects/update/{id}",
+  method: "put",
+  request: {
+    params: idParamSchema,
+    body: jsonContentRequired(updateProjectSchema, "Update project"),
+  },
+  responses: {
+    [OK]: jsonContent(selectProjectsSchema, "The created project"),
+    [UNPROCESSABLE_ENTITY]: jsonContent(
+      createErrorSchema(idParamSchema.or(updateProjectSchema)),
+      "The validation error",
     ),
     [NOT_FOUND]: jsonContent(
       z.object({
         msg: z.string(),
       }),
-
-      "Id not found"
+      "Id not found",
     ),
   },
 });
 
 export type UpdateProjectRoute = typeof updateProjectRoute;
+
+export const deleteProjectRoute = createProtectedRoute({
+  tags: ["projects"],
+  path: "/projects/delete/{id}",
+  method: "delete",
+  request: {
+    params: idParamSchema,
+  },
+  responses: {
+    [OK]: jsonContent(
+      z.object({ msg: z.string() }),
+      "The success of operation",
+    ),
+    [NOT_FOUND]: jsonContent(
+      z.object({
+        msg: z.string(),
+      }),
+      "Id not found",
+    ),
+  },
+});
+
+export type DeleteProjectRoute = typeof deleteProjectRoute;
+
+export const orderProjectsListRoute = createProtectedRoute({
+  tags: ["projects"],
+  path: "/projects/order",
+  method: "put",
+  request: {
+    body: jsonContentRequired(
+      z.array(
+        z.object({
+          id: z.number(),
+          order: z.number(),
+        }),
+      ),
+      "Order projects",
+    ),
+  },
+  responses: {
+    [OK]: jsonContent(
+      z.object({ msg: z.string() }),
+      "The success of operation",
+    ),
+  },
+});
+
+export type OrderProjectsListRoute = typeof orderProjectsListRoute;

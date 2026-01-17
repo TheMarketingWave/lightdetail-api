@@ -1,26 +1,15 @@
-# Build stage
-FROM oven/bun:1.2-debian AS build
-
+# use the official Bun image
+# see all versions at https://hub.docker.com/r/oven/bun/tags
+FROM oven/bun:1 AS base
 WORKDIR /app
-
-COPY bun.lock package.json ./
-
-RUN bun install --frozen-lockfile --production --verbose
 
 COPY . .
 
-# RUN bun build
-RUN bun build --compile --minify --sourcemap ./src --outfile lightdetail-api
+RUN bun install --frozen-lockfile
 
-# Our application runner
-FROM gcr.io/distroless/base-debian12:nonroot AS runner
+RUN mkdir -p data && chown -R bun:bun data
+VOLUME /app/data
 
-ENV NODE_ENV=production
-WORKDIR /app
-
-ARG BUILD_APP_PORT=3000
-ENV APP_PORT=${BUILD_APP_PORT}
-EXPOSE ${APP_PORT}
-
-COPY --from=build /app/lightdetail-api .
-ENTRYPOINT ["./lightdetail-api"]
+USER bun
+EXPOSE ${PORT}
+ENTRYPOINT [ "bun", "run", "run:container" ]

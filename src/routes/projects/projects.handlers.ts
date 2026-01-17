@@ -1,6 +1,8 @@
 import {
   AddProjectRoute,
+  DeleteProjectRoute,
   GetProjectByIdtRoute,
+  OrderProjectsListRoute,
   ProjectListByTypeRoute,
   ProjectListRoute,
   UpdateProjectRoute,
@@ -9,12 +11,14 @@ import { AppRouteHandler } from "../../lib/types";
 import db from "../../db";
 import { projectsTable } from "../../db/schema";
 import { OK, NOT_FOUND } from "../../middlewares/helpers/http-status-codes";
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 
 export const projectsListHandler: AppRouteHandler<ProjectListRoute> = async (
-  c
+  c,
 ) => {
-  const rows = await db.query.projectsTable.findMany();
+  const rows = await db.query.projectsTable.findMany({
+    orderBy: [desc(projectsTable.order), desc(projectsTable.id)],
+  });
 
   return c.json(rows);
 };
@@ -36,11 +40,28 @@ export const getProjectByIdtHandler: AppRouteHandler<
 };
 
 export const addProjectHandler: AppRouteHandler<AddProjectRoute> = async (
-  c
+  c,
 ) => {
   const project = c.req.valid("json");
 
-  const [r] = await db.insert(projectsTable).values(project).returning();
+  const latestProject = await db.query.projectsTable.findFirst({
+    orderBy: [desc(projectsTable.order)],
+  });
+
+  const order =
+    latestProject?.order && latestProject.order !== 1
+      ? latestProject.order + 1
+      : 1;
+
+  const [r] = await db
+    .insert(projectsTable)
+    .values({
+      ...project,
+      createdAt: Number(new Date()),
+      updatedAt: Number(new Date()),
+      order,
+    })
+    .returning();
 
   return c.json(r, OK);
 };
@@ -50,16 +71,15 @@ export const projectsListByTypeHandler: AppRouteHandler<
 > = async (c) => {
   const { type } = c.req.valid("param");
   const rows = await db.query.projectsTable.findMany({
-    where(fields, operators) {
-      return operators.eq(fields.type, type);
-    },
+    where: eq(projectsTable.type, type),
+    orderBy: [desc(projectsTable.order), desc(projectsTable.id)],
   });
 
   return c.json(rows, OK);
 };
 
 export const updateProjectHandler: AppRouteHandler<UpdateProjectRoute> = async (
-  c
+  c,
 ) => {
   const { id } = c.req.valid("param");
   const payload = c.req.valid("json");
@@ -74,9 +94,42 @@ export const updateProjectHandler: AppRouteHandler<UpdateProjectRoute> = async (
 
   const [r] = await db
     .update(projectsTable)
-    .set(payload)
+    .set({ ...payload, updatedAt: Number(new Date()) })
     .where(eq(projectsTable.id, id))
     .returning();
 
   return c.json(r, OK);
+};
+
+export const deleteProjectHandler: AppRouteHandler<DeleteProjectRoute> = async (
+  c,
+) => {
+  const { id } = c.req.valid("param");
+
+  const project = await db.query.projectsTable.findFirst({
+    where: eq(projectsTable.id, id),
+  });
+
+  if (!project) {
+    return c.json({ msg: "Project not found" }, NOT_FOUND);
+  }
+
+  await db.delete(projectsTable).where(eq(projectsTable.id, id));
+
+  return c.json({ msg: "Success" }, OK);
+};
+
+export const orderProjectListHandler: AppRouteHandler<
+  OrderProjectsListRoute
+> = async (c) => {
+  const payload = c.req.valid("json");
+
+  for (const item of payload) {
+    await db
+      .update(projectsTable)
+      .set({ order: item.order })
+      .where(eq(projectsTable.id, item.id));
+  }
+
+  return c.json({ msg: "Success" }, OK);
 };
