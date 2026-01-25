@@ -3,13 +3,15 @@
 FROM oven/bun:1 AS base
 WORKDIR /app
 
-COPY . .
-
+# Install dependencies first (better layer caching)
+COPY package.json bun.lockb ./
 RUN bun install --frozen-lockfile
+
+# Copy source code
+COPY . .
 
 RUN mkdir -p data && chown -R bun:bun data
 VOLUME /app/data
 
 USER bun
-EXPOSE ${PORT}
 ENTRYPOINT [ "bun", "run", "run:container" ]
