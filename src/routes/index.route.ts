@@ -5,7 +5,7 @@ import { OK } from "../middlewares/helpers/http-status-codes";
 
 const router = createRouter().openapi(
   createRoute({
-    tags: ["Index"],
+    tags: ["home"],
     method: "get",
     path: "/",
     responses: {
@@ -19,17 +19,11 @@ const router = createRouter().openapi(
               msg: "Example string",
             },
           }),
-        "LightDetail API Index"
+        "LightDetail API Index",
       ),
     },
   }),
   (c) => {
-    const session = c.var.session;
-    const user = c.var.user;
-    console.log(session, user);
-
     return c.json({ msg: "Works" }, OK);
-  }
+  },
 );
-
-export default router;
