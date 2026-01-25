@@ -27,3 +27,5 @@ const router = createRouter().openapi(
     return c.json({ msg: "Works" }, OK);
   },
 );
+
+export default router;
