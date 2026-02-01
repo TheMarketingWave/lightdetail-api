@@ -41,5 +41,9 @@ export const auth = betterAuth({
       },
     }),
   ],
-  trustedOrigins: ["https://client.scalar.com"],
+  trustedOrigins: [
+    "https://client.scalar.com",
+    "http://localhost:3000",
+    "http://localhost:5173",
+  ],
 });

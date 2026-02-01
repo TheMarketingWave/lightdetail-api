@@ -1,9 +1,10 @@
 import { createRouter } from "../../lib/create-app";
-import { uploadImgHandler, getImgHandler } from "./images.handlers";
-import { uploadImageRoute, getImageRoute } from "./images.routes";
+import { deleteImgHandler, getImgHandler, uploadImgHandler } from "./images.handlers";
+import { deleteImageRoute, getImageRoute, uploadImageRoute } from "./images.routes";
 
 const router = createRouter()
   .openapi(getImageRoute, getImgHandler)
-  .openapi(uploadImageRoute, uploadImgHandler);
+  .openapi(uploadImageRoute, uploadImgHandler)
+  .openapi(deleteImageRoute, deleteImgHandler);
 
 export default router;

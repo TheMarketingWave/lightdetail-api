@@ -1,7 +1,11 @@
 import sharp from "sharp";
 import { AppRouteHandler } from "../../lib/types";
-import { OK } from "../../middlewares/helpers/http-status-codes";
-import { GetImageRoute, UploadImageRoute } from "./images.routes";
+import { NOT_FOUND, OK } from "../../middlewares/helpers/http-status-codes";
+import {
+  DeleteImageRoute,
+  GetImageRoute,
+  UploadImageRoute,
+} from "./images.routes";
 import { basename } from "node:path";
 
 const LIMIT_1MB = 1 * 1024 * 1024;
@@ -69,4 +73,22 @@ export const getImgHandler: AppRouteHandler<GetImageRoute> = async (c) => {
   }
 
   return new Response(file);
+};
+
+export const deleteImgHandler: AppRouteHandler<DeleteImageRoute> = async (
+  c,
+) => {
+  const { id } = c.req.valid("param");
+  const filename = basename(id);
+
+  const path = `./data/uploads/${filename}`;
+
+  const file = Bun.file(path);
+  if (!(await file.exists())) {
+    return c.json({ message: "Image not found" }, NOT_FOUND);
+  }
+
+  await file.delete();
+
+  return c.json({ message: "Image deleted successfully" }, OK);
 };

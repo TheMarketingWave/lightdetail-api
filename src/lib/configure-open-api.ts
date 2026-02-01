@@ -10,10 +10,15 @@ function configureOpenApi(app: AppOpenApi) {
   app.use(
     "/*",
     cors({
-      origin: "*",
+      origin: [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://localhost:3001",
+      ],
       allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
       allowHeaders: ["Content-Type", "Authorization"],
-    })
+      credentials: true,
+    }),
   );
 
   app.openAPIRegistry.registerComponent("securitySchemes", "cookieAuth", {
@@ -37,13 +42,13 @@ function configureOpenApi(app: AppOpenApi) {
         { url: "/doc", title: "Api" },
         { url: "/api/auth/open-api/generate-schema", title: "Auth" },
       ],
-    })
+    }),
   );
 
   app.on(
     ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
     "/api/auth/*",
-    (c) => auth.handler(c.req.raw)
+    (c) => auth.handler(c.req.raw),
   );
 }
 

@@ -1,6 +1,7 @@
 import { createRoute, z } from "@hono/zod-openapi";
 import {
   INTERNAL_SERVER_ERROR,
+  NOT_FOUND,
   OK,
 } from "../../middlewares/helpers/http-status-codes";
 import jsonContent from "../../middlewares/helpers/ json-content";
@@ -66,3 +67,30 @@ export const getImageRoute = createRoute({
 });
 
 export type GetImageRoute = typeof getImageRoute;
+
+export const deleteImageRoute = createRoute({
+  tags: ["images"],
+  path: "/images/delete/{id}",
+  method: "delete",
+  request: {
+    params: z.object({
+      id: z.string(),
+    }),
+  },
+  responses: {
+    [OK]: jsonContent(
+      z.object({
+        message: z.string(),
+      }),
+      "Image deleted successfully",
+    ),
+    [NOT_FOUND]: jsonContent(
+      z.object({
+        message: z.string(),
+      }),
+      "Image not found",
+    ),
+  },
+});
+
+export type DeleteImageRoute = typeof deleteImageRoute;
