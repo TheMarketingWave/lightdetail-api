@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-LightDetail API - REST API for managing project portfolios, staff, and images.
+LightDetail API - REST API for managing project portfolios, staff, images, videos, and CMS content.
 
 ## Commands
 
@@ -53,4 +53,14 @@ All request/response schemas use Zod with `@hono/zod-openapi` for automatic Open
 - App config: `src/app.ts`
 - Environment validation: `src/env.ts`
 - Database: `data/dev.db`
-- Uploaded images: `data/uploads/`
+- Uploaded images/videos: `data/uploads/`
+
+## Content CMS
+
+The `contentTable` stores website content in a hierarchical tree structure. Content items can be nested under `section` or `list` type parents to arbitrary depth.
+
+- **Types**: `text`, `image`, `video`, `section`, `list`
+- **Tree**: Self-referential `parentId` with cascade delete in application code
+- **Ordering**: `order` column for sibling ordering, auto-assigned on insert
+- **Metadata**: JSON column for type-specific data (alt text, format, duration, etc.)
+- **Keys**: Globally unique `key` for each content item (e.g., `hero-title`, `about-section`)

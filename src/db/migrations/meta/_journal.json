@@ -43,6 +43,13 @@
       "when": 1768674265633,
       "tag": "0005_lonely_harpoon",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1771437925227,
+      "tag": "0006_optimal_boom_boom",
+      "breakpoints": true
     }
   ]
 }

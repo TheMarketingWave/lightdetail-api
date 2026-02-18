@@ -1,6 +1,6 @@
 # LightDetail API
 
-A REST API backend for managing project portfolios, staff information, and image uploads. Built with Hono.js, TypeScript, and Bun.
+A REST API backend for managing project portfolios, staff information, image/video uploads, and CMS content. Built with Hono.js, TypeScript, and Bun.
 
 ## Tech Stack
 
@@ -68,8 +68,34 @@ BETTER_AUTH_URL=http://localhost:3001
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| POST | /images | No | Upload image |
-| GET | /images/{filename} | No | Retrieve image |
+| POST | /images/upload | No | Upload image (auto-converts to WebP) |
+| GET | /images/get/{id} | No | Retrieve image |
+| DELETE | /images/delete/{id} | No | Delete image |
+
+### Videos
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | /videos/upload | No | Upload video (mp4, webm, mov — 50MB limit) |
+| GET | /videos/get/{id} | No | Retrieve video |
+| DELETE | /videos/delete/{id} | No | Delete video |
+
+### Content (CMS)
+
+Hierarchical content storage for website sections, text, images, and videos.
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | /content | No | Flat list of all content |
+| GET | /content/tree | No | Full nested tree structure |
+| GET | /content/tree/{key} | No | Subtree rooted at a specific key |
+| GET | /content/{id} | No | Single item by ID |
+| POST | /content/add | No | Create content item |
+| PUT | /content/update/{id} | No | Update content item |
+| DELETE | /content/delete/{id} | No | Delete item + cascade children |
+| PUT | /content/order | No | Bulk reorder siblings |
+
+Content types: `text`, `image`, `video`, `section`, `list`. Items can be nested under `section` or `list` parents to arbitrary depth. Each item has a globally unique `key` and an optional `metadata` JSON field for type-specific data.
 
 ### Authentication
 
@@ -106,7 +132,9 @@ src/
 └── routes/           # API route definitions
     ├── projects/     # Project CRUD
     ├── staff/        # Staff CRUD
-    └── images/       # Image upload/retrieval
+    ├── images/       # Image upload/retrieval
+    ├── videos/       # Video upload/retrieval
+    └── content/      # CMS content tree CRUD
 ```
 
 ## Docker

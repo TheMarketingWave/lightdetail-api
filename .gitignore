@@ -1,4 +1,4 @@
 # deps
 node_modules/
-dev.db
+data
 .env

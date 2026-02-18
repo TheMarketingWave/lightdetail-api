@@ -1,5 +1,11 @@
 import { relations } from "drizzle-orm";
-import { sqliteTable, text, integer, index } from "drizzle-orm/sqlite-core";
+import {
+  sqliteTable,
+  text,
+  integer,
+  index,
+  uniqueIndex,
+} from "drizzle-orm/sqlite-core";
 import {
   createInsertSchema,
   createSelectSchema,
@@ -151,3 +157,40 @@ export const accountRelations = relations(account, ({ one }) => ({
     references: [user.id],
   }),
 }));
+
+export const contentTable = sqliteTable(
+  "content",
+  {
+    id: integer().primaryKey({ autoIncrement: true }),
+    key: text().notNull(),
+    value: text(),
+    type: text()
+      .$type<"text" | "image" | "video" | "section" | "list">()
+      .notNull(),
+    parentId: integer("parent_id"),
+    order: integer().default(0),
+    metadata: text("metadata", { mode: "json" }).$type<
+      Record<string, unknown>
+    >(),
+    createdAt: integer(),
+    updatedAt: integer(),
+  },
+  (table) => [
+    index("content_parentId_idx").on(table.parentId),
+    uniqueIndex("content_key_idx").on(table.key),
+  ],
+);
+
+
+export const selectContentSchema = createSelectSchema(contentTable);
+export const addContentSchema = createInsertSchema(contentTable, {
+  key: z.string().min(1),
+  type: z.enum(["text", "image", "video", "section", "list"]),
+}).omit({
+  id: true,
+});
+export const updateContentSchema = createUpdateSchema(contentTable, {
+  type: z.enum(["text", "image", "video", "section", "list"]).optional(),
+}).omit({
+  createdAt: true,
+});

@@ -1,7 +1,7 @@
 import { createRouter } from "../../lib/create-app";
-import { deleteProjectHandler } from "../projects/projects.handlers";
 import {
   addStaffHandler,
+  deleteStaffHandler,
   staffListHandler,
   updateStaffHandler,
 } from "./staff.handlers";
@@ -16,6 +16,6 @@ const router = createRouter()
   .openapi(staffListRoute, staffListHandler)
   .openapi(addStaffRoute, addStaffHandler)
   .openapi(updateStaffRoute, updateStaffHandler)
-  .openapi(deleteStaffRoute, deleteProjectHandler);
+  .openapi(deleteStaffRoute, deleteStaffHandler);
 
 export default router;
