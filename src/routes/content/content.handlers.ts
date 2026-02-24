@@ -134,9 +134,9 @@ export const addContentHandler: AppRouteHandler<AddContentRoute> = async (
       return c.json({ message: "Parent not found" }, BAD_REQUEST);
     }
 
-    if (!["section", "list"].includes(parent.type)) {
+    if (parent.type !== "section") {
       return c.json(
-        { message: "Parent must be a section or list type" },
+        { message: "Parent must be a section type" },
         BAD_REQUEST,
       );
     }
@@ -156,17 +156,27 @@ export const addContentHandler: AppRouteHandler<AddContentRoute> = async (
     order = (maxOrder?.max ?? -1) + 1;
   }
 
-  const [item] = await db
-    .insert(contentTable)
-    .values({
-      ...body,
-      order,
-      createdAt: now,
-      updatedAt: now,
-    })
-    .returning();
+  try {
+    const [item] = await db
+      .insert(contentTable)
+      .values({
+        key: body.key,
+        value: body.value,
+        type: body.type,
+        parentId: body.parentId,
+        metadata: body.metadata,
+        order,
+        createdAt: now,
+        updatedAt: now,
+      })
+      .returning();
 
-  return c.json(item, OK);
+    return c.json(item, OK);
+  } catch (error) {
+    console.log(error);
+
+    return c.json({ message: "failed insert" }, BAD_REQUEST);
+  }
 };
 
 export const updateContentHandler: AppRouteHandler<UpdateContentRoute> = async (

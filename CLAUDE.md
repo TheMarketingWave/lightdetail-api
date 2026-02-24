@@ -57,9 +57,9 @@ All request/response schemas use Zod with `@hono/zod-openapi` for automatic Open
 
 ## Content CMS
 
-The `contentTable` stores website content in a hierarchical tree structure. Content items can be nested under `section` or `list` type parents to arbitrary depth.
+The `contentTable` stores website content in a hierarchical tree structure. Content items can be nested under `section` type parents to arbitrary depth.
 
-- **Types**: `text`, `image`, `video`, `section`, `list`
+- **Types**: `text`, `image`, `video`, `section`
 - **Tree**: Self-referential `parentId` with cascade delete in application code
 - **Ordering**: `order` column for sibling ordering, auto-assigned on insert
 - **Metadata**: JSON column for type-specific data (alt text, format, duration, etc.)

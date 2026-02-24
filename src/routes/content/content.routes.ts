@@ -7,7 +7,7 @@ import {
 import jsonContent from "../../middlewares/helpers/ json-content";
 import { addContentSchema } from "../../db/schema";
 
-const contentTypeEnum = z.enum(["text", "image", "video", "section", "list"]);
+const contentTypeEnum = z.enum(["text", "image", "video", "section"]);
 
 const contentItemSchema = z.object({
   id: z.number(),

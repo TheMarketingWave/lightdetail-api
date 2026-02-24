@@ -165,7 +165,7 @@ export const contentTable = sqliteTable(
     key: text().notNull(),
     value: text(),
     type: text()
-      .$type<"text" | "image" | "video" | "section" | "list">()
+      .$type<"text" | "image" | "video" | "section">()
       .notNull(),
     parentId: integer("parent_id"),
     order: integer().default(0),
@@ -177,7 +177,7 @@ export const contentTable = sqliteTable(
   },
   (table) => [
     index("content_parentId_idx").on(table.parentId),
-    uniqueIndex("content_key_idx").on(table.key),
+    uniqueIndex("content_key_parent_idx").on(table.key, table.parentId),
   ],
 );
 
@@ -185,12 +185,12 @@ export const contentTable = sqliteTable(
 export const selectContentSchema = createSelectSchema(contentTable);
 export const addContentSchema = createInsertSchema(contentTable, {
   key: z.string().min(1),
-  type: z.enum(["text", "image", "video", "section", "list"]),
+  type: z.enum(["text", "image", "video", "section"]),
 }).omit({
   id: true,
 });
 export const updateContentSchema = createUpdateSchema(contentTable, {
-  type: z.enum(["text", "image", "video", "section", "list"]).optional(),
+  type: z.enum(["text", "image", "video", "section"]).optional(),
 }).omit({
   createdAt: true,
 });
