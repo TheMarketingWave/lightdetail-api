@@ -45,5 +45,6 @@ export const auth = betterAuth({
     "https://client.scalar.com",
     "http://localhost:3000",
     "http://localhost:5173",
+    "https://w0ssw8oc4ccw8g8o88co4ggo.themarketingwave.agency",
   ],
 });
