@@ -14,6 +14,7 @@ function configureOpenApi(app: AppOpenApi) {
         "http://localhost:3000",
         "http://localhost:5173",
         "http://localhost:3001",
+        "https://w0ssw8oc4ccw8g8o88co4ggo.themarketingwave.agency",
       ],
       allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
       allowHeaders: ["Content-Type", "Authorization"],
