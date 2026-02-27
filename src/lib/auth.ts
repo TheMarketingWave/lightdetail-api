@@ -41,6 +41,12 @@ export const auth = betterAuth({
       },
     }),
   ],
+  advanced: {
+    crossSubDomainCookies: {
+      enabled: true,
+      domain: ".themarketingwave.agency", // your domain
+    },
+  },
   trustedOrigins: [
     "https://client.scalar.com",
     "http://localhost:3000",
