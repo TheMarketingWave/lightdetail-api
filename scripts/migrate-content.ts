@@ -24,6 +24,11 @@ async function insertMany(
 }
 
 async function main() {
+  const existing = await db.select({ id: contentTable.id }).from(contentTable).limit(1);
+  if (existing.length > 0) {
+    console.log("Content already seeded, skipping.");
+    return;
+  }
   console.log("Seeding content...");
 
   // ─── SITE INFO ───
