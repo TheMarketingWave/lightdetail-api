@@ -4,18 +4,14 @@ import { Scalar } from "@scalar/hono-api-reference";
 import { auth } from "./auth";
 import { pinoLoggerCustom } from "../middlewares/pino-logger";
 import { cors } from "hono/cors";
+import env from "../env";
 
 function configureOpenApi(app: AppOpenApi) {
   app.use(pinoLoggerCustom());
   app.use(
     "/*",
     cors({
-      origin: [
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://localhost:3001",
-        "https://w0ssw8oc4ccw8g8o88co4ggo.themarketingwave.agency",
-      ],
+      origin: env.TRUSTED_ORIGINS.split(",").map((o) => o.trim()),
       allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
       allowHeaders: ["Content-Type", "Authorization"],
       credentials: true,

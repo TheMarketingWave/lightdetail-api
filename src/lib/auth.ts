@@ -6,6 +6,7 @@ import {
 } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import db from "../db";
+import env from "../env";
 import {
   adminAc,
   defaultStatements,
@@ -43,14 +44,9 @@ export const auth = betterAuth({
   ],
   advanced: {
     crossSubDomainCookies: {
-      enabled: true,
-      domain: ".themarketingwave.agency", // your domain
+      enabled: env.NODE_ENV === "production",
+      domain: env.COOKIE_DOMAIN,
     },
   },
-  trustedOrigins: [
-    "https://client.scalar.com",
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "https://w0ssw8oc4ccw8g8o88co4ggo.themarketingwave.agency",
-  ],
+  trustedOrigins: env.TRUSTED_ORIGINS.split(",").map((o) => o.trim()),
 });

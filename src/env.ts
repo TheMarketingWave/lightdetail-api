@@ -7,6 +7,8 @@ const EnvSchema = z.object({
   DATABASE_URL: z.url(),
   BETTER_AUTH_SECRET: z.string(),
   BETTER_AUTH_URL: z.string(),
+  TRUSTED_ORIGINS: z.string(),
+  COOKIE_DOMAIN: z.string(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
