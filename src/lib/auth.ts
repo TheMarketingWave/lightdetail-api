@@ -11,7 +11,7 @@ import env from "../env";
 import {
   adminAc,
   defaultStatements,
-} from "better-auth/plugins/organization/access";
+} from "better-auth/plugins/admin/access";
 
 const statement = {
   ...defaultStatements,
