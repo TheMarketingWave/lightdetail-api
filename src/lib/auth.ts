@@ -2,6 +2,7 @@ import { betterAuth } from "better-auth";
 import {
   openAPI,
   admin as adminPlugin,
+  bearer,
   createAccessControl,
 } from "better-auth/plugins";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -35,6 +36,7 @@ export const auth = betterAuth({
   }),
   plugins: [
     openAPI(),
+    bearer(),
     adminPlugin({
       ac,
       roles: {
